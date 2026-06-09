@@ -1,0 +1,159 @@
+## Retail Database Project
+
+---
+
+### Step 1 — Create the Database
+
+```
+create database retail_dw;
+mysql -u root -p retail_dw < "path\00_retail_dw.sql"
+```
+
+This file creates a Retail Store OLTP Database. It has tables for customers, products, stores, suppliers, sales orders, and inventory — basically a structure to store the daily transactions of a retail business.
+
+OLTP (Online Transaction Processing) is used because it is good for real-time insert and update operations — like placing an order, reducing stock, or registering a customer.
+
+Indexes and foreign keys are added to keep queries fast and data consistent.
+
+> OLTP is not a raw database — it is the main/primary database where live transactions are stored directly. It is built by Database Architects or Backend Developers based on business needs.
+
+---
+
+### Step 2 — Create OLTP Database
+
+```
+create database retail_oltp;
+mysql -u root -p retail_dw < "path\eda_final.sql"
+```
+
+Lookup tables are small reference tables that store fixed values — like gender (M/F), payment mode (Cash/Card/UPI), or order status (Pending/Delivered).
+
+They are created to avoid repeating data — instead of writing "Cash" in every order, we just store `payment_mode_id = 1`, which saves storage and improves performance. They also ensure data consistency — no invalid value can be entered because the ID must come from the lookup table.
+
+---
+
+### Step 3 — Fill Lookup Tables
+
+```
+mysql -u root -p retail_oltp < "path\02_lookup_table_fill.sql"
+```
+
+This file fills the lookup tables with data — fixed values for gender, payment mode, channel, and order status are inserted. Some values are written directly, and some are copied from the existing `retail_dw` database so both databases have the same values.
+
+---
+
+### Step 4 — Migrate Data from Old to New Database
+
+```
+mysql -u root -p retail_oltp < "path\03_oltp_load_from_retail_dw.sql"
+```
+
+This is a one-time data migration — it loads all data from the old `retail_dw` (Data Warehouse) into the new `retail_oltp` database. Categories, brands, suppliers, stores, customers, products, orders, and inventory — everything is moved using a stored procedure.
+
+This was done because the old `retail_dw` is now deprecated, and going forward only `retail_oltp` will be used.
+
+---
+
+### Step 5 — Validate the Migration
+
+```
+mysql -u root -p retail_oltp < "path\04_data_validation_and_test.sql"
+```
+
+This file compares `retail_dw` (old) and `retail_oltp` (new) to confirm the migration was successful. It checks if the counts of customers, products, stores, and transactions match. It also checks referential integrity, data quality (e.g., MRP should not be less than cost price), and verifies sample orders.
+
+---
+
+### Step 6 — Quick Health Check
+
+```
+mysql -u root -p retail_oltp < "path\05_quick_reference.sql"
+```
+
+This is a quick health check after migration — it shows total record counts, date range, top customers, and top products to confirm all data loaded correctly. It runs on `retail_oltp` (the file starts with `USE retail_oltp;`).
+
+---
+
+---
+
+### Step 7 — Create ROLAP Database
+
+```
+CREATE DATABASE retail_rolap;
+mysql -u root -p < "path\ROLAP\01_create_rolap_schema.sql"
+```
+
+This file creates the `retail_rolap` analytical database using a Star Schema — one fact table (`fact_sales`) and dimension tables for product, store, customer, supplier, and date.
+
+It also has pre-computed aggregate tables (daily/monthly sales, customer lifetime value) so analytical queries run fast. This is completely separate from OLTP — it is only for reporting and analysis.
+
+---
+
+### Step 8 — Create MOLAP Database
+
+```
+mysql -u root -p < "path\ROLAP\02_create_molap_schema.sql"
+```
+
+This file creates the `retail_molap` database with pre-aggregated multi-dimensional cubes — ready-made tables for store × product × date, category × month, customer segment, time series, etc.
+
+It is different from ROLAP because data is pre-calculated and stored in cube tables, so complex analytical queries run instantly without doing calculations again and again.
+
+A cube table is a pre-calculated summary table where data for multiple dimensions (store, product, date) is already aggregated so queries give instant results.
+
+---
+
+### Step 9 — ETL from OLTP to ROLAP
+
+```
+mysql -u root -p < "path\ROLAP\03_etl_rolap_from_oltp.sql"
+```
+
+This file runs the ETL process — it takes data from `retail_oltp` and loads it into `retail_rolap`. It fills dimension tables (product, store, customer, supplier), the date table, and the `fact_sales` table. Then it refreshes aggregate tables (daily/monthly sales, customer lifetime value) so ROLAP is fully ready for analytics.
+
+---
+
+### Step 10 — ETL from ROLAP to MOLAP
+
+```
+mysql -u root -p < "path\ROLAP\04_etl_molap_from_rolap.sql"
+```
+
+This file takes data from `retail_rolap` and refreshes all cube tables in `retail_molap` — 7 different cubes like store × product × date, category × month, time series, and customer segmentation are filled.
+
+This is the ROLAP to MOLAP ETL — it takes the already aggregated data and stores it in an even more pre-summarized cube format for instant multi-dimensional analysis.
+
+---
+
+### Step 11 — Run Analytical Queries on ROLAP
+
+```
+mysql -u root -p < "path\ROLAP\05_analytical_queries_rolap.sql"
+```
+
+This file runs analytical queries on `retail_rolap` — 8 ready-made business reports like daily sales trend, top categories, store performance, customer segmentation, and best-selling products. These queries help managers make business decisions by showing which store, product, or customer segment is performing best.
+
+---
+
+### Step 12 — Run Analytical Queries on MOLAP
+
+```
+mysql -u root -p < "path\ROLAP\06_analytical_queries_molap.sql"
+```
+
+This file runs queries on `retail_molap` pre-calculated cube tables — 8 fast reports like category × month sales, product drill-down, store geography rollup, time series moving averages, customer segmentation, and year-over-year comparison.
+
+These are faster than ROLAP queries because data is already aggregated in cubes — the query directly gets results from the cube table without doing big joins or calculations.
+
+---
+
+### Window Functions (Advanced SQL)
+
+The file also contains window function examples for advanced analysis:
+
+- ROW_NUMBER, RANK, DENSE_RANK — ranking stores by total sales
+- LAG — comparing each store's current month sales with the previous month (Month-over-Month growth)
+- SUM() OVER — running cumulative total sales per product
+- CASE WHEN — labeling trends as UP / DOWN / FLAT
+- Good vs Bad query examples — showing how to write fast, optimized SQL vs slow, unoptimized SQL
+
