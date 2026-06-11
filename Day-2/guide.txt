@@ -1,3 +1,8 @@
+set environment variable path
+
+C:\Program Files\MySQL\MySQL Server 8.0\bin
+
+
 ## Retail Database Project
 
 ---
@@ -6,6 +11,7 @@
 
 ```
 create database retail_dw;
+
 mysql -u root -p retail_dw < "path\00_retail_dw.sql"
 ```
 
@@ -23,6 +29,7 @@ Indexes and foreign keys are added to keep queries fast and data consistent.
 
 ```
 create database retail_oltp;
+
 mysql -u root -p retail_dw < "path\eda_final.sql"
 ```
 
@@ -87,19 +94,6 @@ This file creates the `retail_rolap` analytical database using a Star Schema —
 
 It also has pre-computed aggregate tables (daily/monthly sales, customer lifetime value) so analytical queries run fast. This is completely separate from OLTP — it is only for reporting and analysis.
 
----
-
-### Step 8 — Create MOLAP Database
-
-```
-mysql -u root -p < "path\ROLAP\02_create_molap_schema.sql"
-```
-
-This file creates the `retail_molap` database with pre-aggregated multi-dimensional cubes — ready-made tables for store × product × date, category × month, customer segment, time series, etc.
-
-It is different from ROLAP because data is pre-calculated and stored in cube tables, so complex analytical queries run instantly without doing calculations again and again.
-
-A cube table is a pre-calculated summary table where data for multiple dimensions (store, product, date) is already aggregated so queries give instant results.
 
 ---
 
