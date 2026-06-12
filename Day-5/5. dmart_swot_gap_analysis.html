@@ -1,0 +1,146 @@
+
+<style>
+  .section-title { font-size:18px; font-weight:500; color:var(--color-text-primary); margin:24px 0 12px; }
+  .sub-title { font-size:14px; font-weight:500; color:var(--color-text-secondary); margin:0 0 6px; }
+  .grid-2 { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+  .grid-4 { display:grid; grid-template-columns:1fr 1fr 1fr 1fr; gap:12px; }
+  .card { padding:14px 16px; border-radius:var(--border-radius-lg); border:1px solid var(--color-border-tertiary); }
+  .card ul { margin:6px 0 0; padding-left:16px; font-size:13px; color:var(--color-text-secondary); line-height:1.7; }
+  .card ul li { margin-bottom:2px; }
+  .s { background:#EAF3DE; border-color:#97C459; }
+  .s .sub-title { color:#27500A; }
+  .s ul { color:#3B6D11; }
+  .w { background:#FCEBEB; border-color:#F09595; }
+  .w .sub-title { color:#791F1F; }
+  .w ul { color:#A32D2D; }
+  .o { background:#E6F1FB; border-color:#85B7EB; }
+  .o .sub-title { color:#0C447C; }
+  .o ul { color:#185FA5; }
+  .t2 { background:#FAEEDA; border-color:#EF9F27; }
+  .t2 .sub-title { color:#633806; }
+  .t2 ul { color:#854F0B; }
+  .gap-row { display:grid; grid-template-columns:1.2fr 1.2fr 1.6fr 1.6fr; gap:0; border:1px solid var(--color-border-tertiary); border-radius:var(--border-radius-lg); overflow:hidden; margin-bottom:8px; }
+  .gap-cell { padding:12px 14px; font-size:13px; color:var(--color-text-secondary); line-height:1.6; border-right:1px solid var(--color-border-tertiary); }
+  .gap-cell:last-child { border-right:none; }
+  .gap-header { background:var(--color-background-secondary); font-weight:500; font-size:13px; color:var(--color-text-primary); }
+  .gap-area { font-weight:500; color:var(--color-text-primary); font-size:13px; }
+  .as-is { color:var(--color-text-danger); }
+  .to-be { color:var(--color-text-success); }
+  .action { color:var(--color-text-info); }
+  .divider { height:1px; background:var(--color-border-tertiary); margin:28px 0; }
+</style>
+
+<div style="padding:4px 0 8px">
+  <div class="section-title">SWOT Analysis — DMart Sales Analytics Dashboard</div>
+
+  <div class="grid-2">
+    <div class="card s">
+      <div class="sub-title">Strengths (Internal)</div>
+      <ul>
+        <li>retail_rolap star schema already built — no new data infra needed</li>
+        <li>2+ years of historical transaction data available</li>
+        <li>Defined ETL pipeline with daily refresh (agg_* tables ready)</li>
+        <li>RFM segments pre-computed in dim_customer</li>
+        <li>350+ stores = statistically rich dataset for benchmarking</li>
+      </ul>
+    </div>
+    <div class="card w">
+      <div class="sub-title">Weaknesses (Internal)</div>
+      <ul>
+        <li>No real-time data — daily refresh only, 6AM cutoff</li>
+        <li>Online channel data missing from retail_oltp entirely</li>
+        <li>Power BI Gateway dependency on IT team for setup</li>
+        <li>No predictive or ML capability in current scope</li>
+        <li>Store Managers limited to their store_key — cross-store view blocked by RLS</li>
+      </ul>
+    </div>
+    <div class="card o">
+      <div class="sub-title">Opportunities (External)</div>
+      <ul>
+        <li>35+ analyst hours/month freed up — can redirect to strategic work</li>
+        <li>Tier 2/3 city expansion planning enabled via city tier revenue charts</li>
+        <li>Loyalty ROI quantification can inform marketing budget decisions</li>
+        <li>Cross-sell opportunities from RFM "Needs Attention" segment</li>
+        <li>Mobile Power BI rollout for field Regional Managers on the move</li>
+      </ul>
+    </div>
+    <div class="card t2">
+      <div class="sub-title">Threats (External)</div>
+      <ul>
+        <li>MySQL Gateway failure = zero data refresh — no fallback automated</li>
+        <li>Scope creep risk rated HIGH (per risk register) post sign-off</li>
+        <li>Low stakeholder adoption if training sessions not conducted</li>
+        <li>Data quality issues in retail_rolap can erode CFO trust in numbers</li>
+        <li>Power BI Pro/Premium licensing cost if org-wide rollout needed</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <div class="section-title">Gap Analysis — Current State vs Target State</div>
+  <p style="font-size:13px;color:var(--color-text-secondary);margin:0 0 14px">Each row shows where DMart is today (AS-IS), where it needs to be (TO-BE), and the specific action bridging the gap.</p>
+
+  <div class="gap-row">
+    <div class="gap-cell gap-header">Area</div>
+    <div class="gap-cell gap-header as-is">AS-IS (Current Gap)</div>
+    <div class="gap-cell gap-header to-be">TO-BE (Target)</div>
+    <div class="gap-cell gap-header action">Bridge Action</div>
+  </div>
+
+  <div class="gap-row">
+    <div class="gap-cell gap-area">Reporting Speed</div>
+    <div class="gap-cell as-is">Monthly Excel reports — 15–20 day lag in decision-making</div>
+    <div class="gap-cell to-be">Report generated in &lt;5 minutes, refreshed daily at 6AM</div>
+    <div class="gap-cell action">Power BI Gateway + scheduled daily refresh from retail_rolap</div>
+  </div>
+
+  <div class="gap-row">
+    <div class="gap-cell gap-area">Data Centralization</div>
+    <div class="gap-cell as-is">Store managers email CSVs to HQ — no central visibility</div>
+    <div class="gap-cell to-be">Single Power BI Service workspace, all stores in one model</div>
+    <div class="gap-cell action">Direct MySQL connection replacing CSV email workflow</div>
+  </div>
+
+  <div class="gap-row">
+    <div class="gap-cell gap-area">Customer Intelligence</div>
+    <div class="gap-cell as-is">No RFM or segmentation — cannot identify at-risk customers</div>
+    <div class="gap-cell to-be">RFM segments visible (Champions, Loyal, At-Risk, Inactive)</div>
+    <div class="gap-cell action">FR-11: agg_customer_lifetime CLV page with segment drilldown</div>
+  </div>
+
+  <div class="gap-row">
+    <div class="gap-cell gap-area">Product Analysis</div>
+    <div class="gap-cell as-is">Pivot tables for category — no margin vs revenue cross-analysis</div>
+    <div class="gap-cell to-be">Bubble chart: Revenue vs Margin % per category, interactive</div>
+    <div class="gap-cell action">FR-07 (US-07): dim_product joined to fact_sales with DAX margin %</div>
+  </div>
+
+  <div class="gap-row">
+    <div class="gap-cell gap-area">Store Benchmarking</div>
+    <div class="gap-cell as-is">No cross-store comparison — each store operates in a silo</div>
+    <div class="gap-cell to-be">Top 10 stores bar chart + state-wise filled map with RLS</div>
+    <div class="gap-cell action">FR-06/07: dim_store city/state/tier joined, RLS for store managers</div>
+  </div>
+
+  <div class="gap-row">
+    <div class="gap-cell gap-area">Inventory Visibility</div>
+    <div class="gap-cell as-is">Weekly stock report per store — out-of-stock not proactively flagged</div>
+    <div class="gap-cell to-be">Proactive alerts via dashboard (flagged low-stock items)</div>
+    <div class="gap-cell action">Out of scope v1.0 — flagged as future enhancement post go-live</div>
+  </div>
+
+  <div class="gap-row">
+    <div class="gap-cell gap-area">Analyst Time</div>
+    <div class="gap-cell as-is">40+ hours/month spent on manual reporting and data wrangling</div>
+    <div class="gap-cell to-be">&gt;35 hours/month saved — analysts shift to strategic analysis</div>
+    <div class="gap-cell action">Full automation via scheduled refresh; no manual ETL intervention</div>
+  </div>
+
+  <div class="gap-row">
+    <div class="gap-cell gap-area">Access Control</div>
+    <div class="gap-cell as-is">No enforced data segmentation — risk of cross-store data leakage</div>
+    <div class="gap-cell to-be">Row-Level Security: each Store Manager sees only their store_key</div>
+    <div class="gap-cell action">Power BI RLS rules mapped to dim_store[store_key] in Week 4 UAT</div>
+  </div>
+</div>
